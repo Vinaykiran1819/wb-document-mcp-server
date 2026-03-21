@@ -1,0 +1,1 @@
+# LLM adapters (Ollama, Groq, etc.)

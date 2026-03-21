@@ -1,0 +1,1 @@
+# Integration Tests: Testing the MCP tools & schemas
