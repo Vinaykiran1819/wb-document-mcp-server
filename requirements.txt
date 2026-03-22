@@ -1,1 +1,19 @@
 # Project dependencies
+
+# Model Context Protocol
+mcp>=1.2.0
+
+# Network and Data
+httpx>=0.27.0
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+
+# LLM Connectivity (Standard for Groq/Ollama/OpenAI)
+openai>=1.0.0
+
+# Professional CLI Output (Optional but recommended for "Premium" status)
+rich>=13.0.0
+
+# Testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
