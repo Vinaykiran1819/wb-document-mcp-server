@@ -43,6 +43,7 @@ def register_tools(mcp: FastMCP, api_client: WorldBankClient) -> None:
 
     @mcp.tool()
     async def filter_documents(
+        qterm: Optional[str] = None,  # ADDED: Allows keyword + filter combination
         count_exact: Optional[str] = None,
         topic_exact: Optional[str] = None,
         docty_exact: Optional[str] = None,
@@ -52,23 +53,19 @@ def register_tools(mcp: FastMCP, api_client: WorldBankClient) -> None:
         offset: int = 0
     ) -> str:
         """
-        Use this tool to find documents using strict structured metadata filters. 
-        This is the REQUIRED tool for any queries involving specific date ranges (strdate/enddate), 
-        countries (count_exact), topics (topic_exact), or document types (docty_exact).
+        Use this tool to find documents using structured filters (dates, countries, topics).
+        You can also provide a 'qterm' to search for keywords WITHIN these filters.
         
         Args:
-            count_exact: Exact country name (e.g., 'Kenya', 'Brazil').
-            topic_exact: Exact topic name (e.g., 'Macroeconomics and Economic Growth').
+            qterm: Optional keyword search within the filters.
+            count_exact: Exact country name (e.g., 'Kenya').
+            topic_exact: Exact topic name (e.g., 'Education').
             docty_exact: Exact document type (e.g., 'Working Paper').
-            strdate: Start date for publication range in YYYY-MM-DD format.
-            enddate: End date for publication range in YYYY-MM-DD format.
-            rows: Number of results to return. Default is 10.
-            offset: Pagination offset. Default is 0.
-            
-        Returns:
-            A JSON string containing the filtered documents.
+            strdate: Start date (YYYY-MM-DD).
+            enddate: End date (YYYY-MM-DD).
         """
         filters = {}
+        if qterm: filters["qterm"] = qterm # Pass keyword to API
         if count_exact: filters["count_exact"] = count_exact
         if topic_exact: filters["topic_exact"] = topic_exact
         if docty_exact: filters["docty_exact"] = docty_exact
@@ -76,6 +73,7 @@ def register_tools(mcp: FastMCP, api_client: WorldBankClient) -> None:
         if enddate: filters["enddate"] = enddate
         
         try:
+            # api_client.search already supports qterm via **filters
             result = await api_client.search(rows=rows, offset=offset, **filters)
             return result.model_dump_json()
         except Exception as e:

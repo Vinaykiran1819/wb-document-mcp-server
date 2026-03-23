@@ -95,15 +95,8 @@ These reports cover various aspects including the implementation, funding status
 
 **User:** Find documents about education financing in Sub-Saharan Africa published between 2019 and 2022.
 
-**Assistant:** The World Bank has found two documents related to education financing in Sub-Saharan Africa published between 2019 and 2022:
+**Assistant:** There are no documents found about education financing in Sub-Saharan Africa published between 2019 and 2022.
 
-1. **Science, education, and development in sub-Saharan Africa**
-   - Published on June 30, 1990
-
-2. **Expenditures on population programs in developing regions : current levels and future requirements**   
-   - Published on January 31, 1985
-
-Neither of these documents match the specified date range or topic criteria for education financing in Sub-Saharan Africa as requested. 
 
 ### Question 3: Language Discovery
 
