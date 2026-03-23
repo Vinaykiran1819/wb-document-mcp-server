@@ -127,11 +127,17 @@ These reports cover various aspects including the implementation, funding status
 These documents suggest a focus on various aspects of education projects, including learning continuity, structure reform, primary education development, and quality improvement.
 
 
-### Question 4: Language Discovery
+### Question 4:
 
-**User:** List all languages the World Bank publishes documents in.
+**User:** Find project documents related to water and sanitation in Brazil..
 
-**Assistant:** The listed languages published by the World Bank do not include any explicit values. This suggests that all documents are available in multiple languages, or there may be no specific language data currently included for these publications.
+**Assistant:** The World Bank has published several project documents related to water and sanitation in Brazil, with the most recent being:
+
+- **Title:** Policies, Institutions Regulations, and Expenditures in the Water and Sanitation Sector in Brazil (Vol. 2 of 2)
+- **Type:** Report
+- **Publication Date:** May 20, 2022
+
+These documents are available in multiple languages as they cover comprehensive themes related to water and sanitation projects in Brazil.
 
 ---
 
