@@ -1,5 +1,5 @@
 # Pydantic models for WB API responses
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Dict, Any
 
 class WBDocument(BaseModel):
@@ -20,6 +20,8 @@ class SearchResponse(BaseModel):
     The structured response from a search or filter query.
     Note: The 'facets' key should be handled separately from 'documents'.
     """
+    model_config = ConfigDict(extra="ignore")
+    
     total: int = Field(default=0, description="Total number of documents matching the query")
     documents: List[WBDocument] = Field(default_factory=list, description="List of matching document records")
 

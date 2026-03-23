@@ -1,4 +1,4 @@
-# LLM adapters (Ollama, Groq, etc.)
+# LLM adapters (Ollama, Groq)
 import os
 from typing import Optional
 from openai import AsyncOpenAI
@@ -10,8 +10,8 @@ load_dotenv()
 class LLMProvider:
     """
     A unified, provider-agnostic LLM client.
-    Because Groq, Ollama, and OpenAI all support the standard OpenAI API structure,
-    we can use a single adapter for all of them by swapping the base_url and api_key.
+    Because Groq and Ollama support the standard OpenAI API structure,
+    we can use a single adapter for both by swapping the base_url and api_key.
     """
     
     def __init__(self, provider_name: str = "ollama"):
@@ -19,7 +19,7 @@ class LLMProvider:
         Initializes the asynchronous LLM client based on the chosen provider.
         
         Args:
-            provider_name: The name of the LLM provider ('ollama', 'groq', or 'openai').
+            provider_name: The name of the LLM provider ('ollama' or 'groq').
         """
         self.provider_name = provider_name.lower()
         self.client = self._initialize_client()
@@ -31,7 +31,7 @@ class LLMProvider:
             # Ollama runs locally, so it needs no API key, just the local port.
             return AsyncOpenAI(
                 base_url="http://localhost:11434/v1",
-                api_key="ollama" 
+                api_key="ollama"
             )
             
         elif self.provider_name == "groq":
@@ -44,15 +44,8 @@ class LLMProvider:
                 api_key=api_key
             )
             
-        elif self.provider_name == "openai":
-            # Standard OpenAI implementation
-            api_key = os.getenv("OPENAI_API_KEY")
-            if not api_key:
-                raise ValueError("OPENAI_API_KEY is missing from the .env file.")
-            return AsyncOpenAI(api_key=api_key)
-            
         else:
-            raise ValueError(f"Unsupported provider: {self.provider_name}. Use 'ollama', 'groq', or 'openai'.")
+            raise ValueError(f"Unsupported provider: {self.provider_name}. Use 'ollama' or 'groq'.")
 
     def _get_default_model(self) -> str:
         """Returns the recommended model string for the chosen provider."""
@@ -62,8 +55,6 @@ class LLMProvider:
         elif self.provider_name == "groq":
             # The recommended fast SLM for Groq
             return "llama-3.1-8b-instant"
-        elif self.provider_name == "openai":
-            return "gpt-4o-mini"
         return ""
 
     def set_model(self, model_name: str):

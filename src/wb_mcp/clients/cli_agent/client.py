@@ -35,8 +35,8 @@ async def run_chat_loop():
             print("[System] ✅ MCP Server connected successfully.")
             
             # Initialize our AI Brain
-            # You can change "ollama" to "groq" or "openai" depending on your setup
-            provider = LLMProvider(provider_name="ollama") 
+            # You can change "ollama" to "groq" depending on your setup
+            provider = LLMProvider(provider_name="ollama")
             orchestrator = AgentOrchestrator(provider=provider, mcp_session=session)
             
             print(f"[System] 🧠 AI Agent initialized with model: {provider.model}")

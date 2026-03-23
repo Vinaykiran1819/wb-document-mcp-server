@@ -18,11 +18,12 @@ def register_tools(mcp: FastMCP, api_client: WorldBankClient) -> None:
         lang_exact: Optional[str] = None
     ) -> str:
         """
-        Use this tool to perform a full-text keyword search across World Bank publications.
-        Ideal for broad queries like "climate change in Kenya" or "education funding".
+        Use this tool ONLY for broad, full-text keyword searches across World Bank publications.
+        DO NOT use this tool if the user provides a specific date range, country, or topic; 
+        use filter_documents instead.
         
         Args:
-            qterm: The main search query (e.g., 'climate Kenya').
+            qterm: The main search query (e.g., 'climate change').
             rows: Number of documents to return (pagination limit). Default is 10.
             offset: The starting index for pagination. Default is 0.
             lang_exact: Optional exact language filter (e.g., 'English', 'French').
@@ -51,14 +52,14 @@ def register_tools(mcp: FastMCP, api_client: WorldBankClient) -> None:
         offset: int = 0
     ) -> str:
         """
-        Use this tool to find documents using strict structured metadata filters instead 
-        of keyword searches. Best used when looking for specific countries, topics, 
-        document types, or specific date ranges.
+        Use this tool to find documents using strict structured metadata filters. 
+        This is the REQUIRED tool for any queries involving specific date ranges (strdate/enddate), 
+        countries (count_exact), topics (topic_exact), or document types (docty_exact).
         
         Args:
             count_exact: Exact country name (e.g., 'Kenya', 'Brazil').
             topic_exact: Exact topic name (e.g., 'Macroeconomics and Economic Growth').
-            docty_exact: Exact document type (e.g., 'Working Paper', 'Project Appraisal Document').
+            docty_exact: Exact document type (e.g., 'Working Paper').
             strdate: Start date for publication range in YYYY-MM-DD format.
             enddate: End date for publication range in YYYY-MM-DD format.
             rows: Number of results to return. Default is 10.
@@ -93,7 +94,6 @@ def register_tools(mcp: FastMCP, api_client: WorldBankClient) -> None:
             A JSON string containing the full document details.
         """
         try:
-            # The API allows fetching a specific document by using the 'id' filter
             result = await api_client.search(id=id, rows=1)
             if result.documents:
                 return result.documents[0].model_dump_json()
@@ -104,13 +104,11 @@ def register_tools(mcp: FastMCP, api_client: WorldBankClient) -> None:
     @mcp.tool()
     async def get_facets(fct: str, qterm: Optional[str] = None) -> str:
         """
-        Use this discovery tool to find all available distinct values for a specific metadata category.
-        ALWAYS use this tool before guessing filters like topics or document types.
+        Discovery tool to find distinct metadata values. Use this BEFORE filter_documents 
+        if you are unsure of the exact spelling of a country, topic, or document type.
         
         Args:
-            fct: The field to discover values for. Valid options usually include 
-                 'count_exact' (countries), 'topic_exact' (topics), 'docty_exact' (doc types), 
-                 or 'lang_exact' (languages).
+            fct: The field to discover (e.g., 'count_exact', 'topic_exact', 'docty_exact').
             qterm: Optional keyword search to narrow down the facet scope.
             
         Returns:
