@@ -97,6 +97,7 @@ These reports cover various aspects including the implementation, funding status
 
 **Assistant:** There are no documents found about education financing in Sub-Saharan Africa published between 2019 and 2022.
 
+### Question 3: Education Financing in Africa (2019-2022)
 
 **User:** Find documents in Kenya for the topic Education between 2019 and 2022.
 
