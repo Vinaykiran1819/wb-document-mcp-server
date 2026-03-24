@@ -1,7 +1,14 @@
 # Required tool definitions
+"""
+tools.py
+Defines the MCP tools for interacting with the World Bank Documents & Reports API.
+Uses FastMCP for tool registration and Pydantic for schema-based input validation.
+"""
+
 from typing import Optional
 from mcp.server.fastmcp import FastMCP
 from wb_mcp.api.client import WorldBankClient
+
 
 def register_tools(mcp: FastMCP, api_client: WorldBankClient) -> None:
     """
@@ -11,11 +18,10 @@ def register_tools(mcp: FastMCP, api_client: WorldBankClient) -> None:
     """
 
     @mcp.tool()
-    async def search_documents(
-        qterm: str,
-        rows: int = 10,
-        offset: int = 0,
-        lang_exact: Optional[str] = None
+    async def search_documents( qterm: str, 
+    lang_exact: Optional[str] = None, 
+    rows: int = 10, 
+    os: int = 0
     ) -> str:
         """
         Use this tool ONLY for broad, full-text keyword searches across World Bank publications.
@@ -31,26 +37,26 @@ def register_tools(mcp: FastMCP, api_client: WorldBankClient) -> None:
         Returns:
             A JSON string containing the total count and the list of matching documents.
         """
-        filters = {}
-        if lang_exact:
-            filters["lang_exact"] = lang_exact
-            
         try:
-            result = await api_client.search(qterm=qterm, rows=rows, offset=offset, **filters)
+            # We use the validated data from the Pydantic model
+            result = await api_client.search(
+                qterm=qterm, 
+                rows=rows, 
+                offset=os,
+                lang_exact=lang_exact
+            )
             return result.model_dump_json()
         except Exception as e:
             return f"Error executing search_documents: {str(e)}"
 
     @mcp.tool()
-    async def filter_documents(
-        qterm: Optional[str] = None,  # ADDED: Allows keyword + filter combination
-        count_exact: Optional[str] = None,
-        topic_exact: Optional[str] = None,
-        docty_exact: Optional[str] = None,
-        strdate: Optional[str] = None,
-        enddate: Optional[str] = None,
-        rows: int = 10,
-        offset: int = 0
+    async def filter_documents(count_exact: Optional[str] = None,
+    docty_exact: Optional[str] = None,
+    strdate: Optional[str] = None,
+    enddate: Optional[str] = None,
+    qterm: Optional[str] = None,
+    rows: int = 10,
+    os: int = 0
     ) -> str:
         """
         Use this tool to find documents using structured filters (dates, countries, topics).
@@ -64,26 +70,26 @@ def register_tools(mcp: FastMCP, api_client: WorldBankClient) -> None:
             strdate: Start date (YYYY-MM-DD).
             enddate: End date (YYYY-MM-DD).
         """
-        filters = {}
-        if qterm: filters["qterm"] = qterm # Pass keyword to API
-        if count_exact: filters["count_exact"] = count_exact
-        if topic_exact: filters["topic_exact"] = topic_exact
-        if docty_exact: filters["docty_exact"] = docty_exact
-        if strdate: filters["strdate"] = strdate
-        if enddate: filters["enddate"] = enddate
-        
         try:
-            # api_client.search already supports qterm via **filters
-            result = await api_client.search(rows=rows, offset=offset, **filters)
+            # Unpacking the model's data into the client
+            filters = {
+            "count_exact": count_exact,
+            "docty_exact": docty_exact,
+            "strdate": strdate,
+            "enddate": enddate,
+            "qterm": qterm
+            }
+            result = await api_client.search(rows=rows, offset=os, **filters)
             return result.model_dump_json()
         except Exception as e:
+        
             return f"Error executing filter_documents: {str(e)}"
 
     @mcp.tool()
     async def get_document(id: str) -> str:
         """
         Use this tool to retrieve the complete metadata for a single specific document 
-        using its unique ID.
+        using its unique ID. This provides 'all fields' available.
         
         Args:
             id: The unique identifier string for the World Bank document.
@@ -92,12 +98,20 @@ def register_tools(mcp: FastMCP, api_client: WorldBankClient) -> None:
             A JSON string containing the full document details.
         """
         try:
-            result = await api_client.search(id=id, rows=1)
-            if result.documents:
-                return result.documents[0].model_dump_json()
-            return f"No document found with ID: {id}"
+            # We use the specialized get_document method from our client
+            # which requests 'all fields' (fl="*") automatically.
+            result = await api_client.get_document(doc_id=id)
+            
+            # Since result is a WBDocument object, we dump it to JSON for the LLM
+            return result.model_dump_json()
+            
+        except ValueError as ve:
+            # Catches "Document not found" from the client logic
+            return f"Error executing get_document: {str(ve)}"
         except Exception as e:
+            # Catches unexpected network/API errors
             return f"Error retrieving document: {str(e)}"
+
 
     @mcp.tool()
     async def get_facets(fct: str, qterm: Optional[str] = None) -> str:
@@ -113,7 +127,11 @@ def register_tools(mcp: FastMCP, api_client: WorldBankClient) -> None:
             A JSON string listing the distinct values and their frequency counts.
         """
         try:
-            result = await api_client.get_facets(facet_field=fct, qterm=qterm)
+            # We pass the fct and optional qterm from the validated args
+            result = await api_client.get_facets(
+                facet_field=fct, 
+                qterm=qterm
+            )
             return result.model_dump_json()
         except Exception as e:
             return f"Error executing get_facets: {str(e)}"

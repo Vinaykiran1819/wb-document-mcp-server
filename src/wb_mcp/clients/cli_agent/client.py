@@ -1,4 +1,11 @@
 # CLI entry point and user loop
+
+"""
+client.py
+The primary CLI entry point for the World Bank Research Assistant.
+Manages the MCP server subprocess, user interaction, and the agentic loop.
+"""
+
 import asyncio
 import sys
 import os

@@ -1,8 +1,23 @@
 # Server entry point (stdio transport)
+"""
+server.py
+The main entry point for the World Bank Documents MCP Server.
+Configures the FastMCP instance, initializes the API client, and starts the stdio transport.
+"""
+
+import sys
+import logging
 import asyncio
 from mcp.server.fastmcp import FastMCP
 from wb_mcp.api.client import WorldBankClient
 from wb_mcp.servers.docs_server.tools import register_tools
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    stream=sys.stderr
+)
+logger = logging.getLogger("wb_docs_mcp")
 
 def create_server() -> FastMCP:
     """

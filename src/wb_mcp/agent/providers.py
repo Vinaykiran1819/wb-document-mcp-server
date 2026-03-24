@@ -1,6 +1,15 @@
 # LLM adapters (Ollama, Groq)
+
+"""
+providers.py
+Unified adapter for LLM/SLM providers: Ollama (Local) and Groq (Cloud).
+Both providers support the OpenAI-compatible API standard, allowing us
+to use a single AsyncOpenAI client for the entire agent logic.
+"""
+
 import os
-from typing import Optional
+import logging
+from typing import List, Dict, Any, Optional
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
 
@@ -53,10 +62,46 @@ class LLMProvider:
             # The model recommended by the task document for local execution
             return "qwen2.5:3b"
         elif self.provider_name == "groq":
-            # The recommended fast SLM for Groq
             return "llama-3.1-8b-instant"
         return ""
 
     def set_model(self, model_name: str):
         """Allows overriding the default model at runtime."""
         self.model = model_name
+
+
+    async def chat_completion(
+        self, 
+        messages: List[Dict[str, str]], 
+        tools: Optional[List[Dict[str, Any]]] = None,
+        tool_choice: str = "auto"
+    ) -> Any:
+        """
+        Sends a chat request to the LLM.
+        
+        Args:
+            messages: The conversation history.
+            tools: Optional list of MCP tool definitions.
+            tool_choice: Control over tool usage ('auto', 'none', or specific tool).
+            
+        Returns:
+            The message object from the LLM response.
+        """
+        try:
+            # Prepare the API arguments
+            params = {
+                "model": self.model,
+                "messages": messages,
+            }
+            
+            # Only include tools if they are actually provided
+            if tools:
+                params["tools"] = tools
+                params["tool_choice"] = tool_choice
+
+            response = await self.client.chat.completions.create(**params)
+            return response.choices[0].message
+            
+        except Exception as e:
+            logger.error(f"LLM Error ({self.provider_name}): {str(e)}")
+            raise
