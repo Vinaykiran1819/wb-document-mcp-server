@@ -7,8 +7,11 @@ Includes robust error handling, retries, and data normalization.
 """
 
 import httpx
+import logging
 from typing import Optional, Dict, Any
 from .schemas import SearchResponse, WBDocument, FacetResponse, FacetValue
+
+logger = logging.getLogger("wb_api_client")
 
 class WorldBankClient:
     """

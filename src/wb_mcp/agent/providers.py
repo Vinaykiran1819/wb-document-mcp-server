@@ -13,6 +13,8 @@ from typing import List, Dict, Any, Optional
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
 
+logger = logging.getLogger("llm_provider")
+
 # Load environment variables from the .env file
 load_dotenv()
 

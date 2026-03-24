@@ -7,6 +7,7 @@ Manages the MCP server subprocess, user interaction, and the agentic loop.
 """
 
 import asyncio
+import logging
 import sys
 import os
 from mcp import ClientSession

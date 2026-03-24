@@ -20,7 +20,7 @@ def register_tools(mcp: FastMCP, api_client: WorldBankClient) -> None:
     @mcp.tool()
     async def search_documents( qterm: str, 
     lang_exact: Optional[str] = None, 
-    rows: int = 10, 
+    rows: int = 5, 
     os: int = 0
     ) -> str:
         """

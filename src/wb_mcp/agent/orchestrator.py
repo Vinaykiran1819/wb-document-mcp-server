@@ -94,6 +94,10 @@ class AgentOrchestrator:
                     result_text = "\n".join(
                         [c.text for c in result.content if c.type == "text"]
                     )
+
+                    if len(result_text) > 12000:
+                        result_text = result_text[:12000] + "... [Output truncated for length]"
+
                 except Exception as e:
                     logger.error(f"Tool Execution Error: {str(e)}")
                     result_text = f"Error: {str(e)}"
